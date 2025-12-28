@@ -1,0 +1,28 @@
+{
+  "name": "@edge/trpc-contracts",
+  "version": "1.0.0",
+  "description": "tRPC contract types for Edge Starter Kit",
+  "type": "module",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./router": "./router.ts"
+  },
+  "files": [
+    "index.ts",
+    "router.ts"
+  ],
+  "keywords": [
+    "trpc",
+    "contracts",
+    "types",
+    "edge"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@trpc/server": "^10.0.0",
+    "typescript": "^5.0.0",
+    "zod": "^3.0.0"
+  }
+}

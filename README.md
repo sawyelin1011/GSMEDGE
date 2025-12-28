@@ -55,18 +55,20 @@ Visit `http://localhost:5173` to see your app running!
 ```
 edge-starter-kit/
 ├── apps/
-│   ├── api/
+│   ├── api/                        # 📦 @edge/api package
 │   │   ├── src/                    # 🌐 Platform-agnostic business logic
 │   │   │   ├── index.ts            # Main Hono app
+│   │   │   ├── types.ts            # AppEnv type definitions
 │   │   │   ├── routes/             # API route handlers
 │   │   │   │   ├── hello.ts        # Example: Hello World
 │   │   │   │   └── todos.ts        # Example: CRUD operations
 │   │   │   └── middleware/         # Custom middleware
-│   │   └── deploy/                 # 🚀 Platform-specific adapters
-│   │       ├── cloudflare.ts       # Cloudflare Workers entry
-│   │       ├── vercel.ts           # Vercel Edge Functions entry
-│   │       ├── deno.ts             # Deno Deploy entry
-│   │       └── node.ts             # Node.js entry
+│   │   ├── deploy/                 # 🚀 Platform-specific adapters
+│   │   │   ├── cloudflare.ts       # Cloudflare Workers entry
+│   │   │   ├── vercel-edge.ts      # Vercel Edge Functions entry
+│   │   │   ├── deno.ts             # Deno Deploy entry
+│   │   │   └── node.ts             # Node.js entry
+│   │   └── package.json            # Package configuration
 │   └── client/
 │       └── src/                    # ⚛️ React frontend
 │           ├── pages/              # Page components
@@ -76,11 +78,28 @@ edge-starter-kit/
 │           ├── components/         # Reusable components
 │           ├── App.tsx             # Root component
 │           └── main.tsx            # Entry point
+├── packages/                       # 📦 Internal packages
+│   ├── core/                       # @edge/core - Core business logic
+│   │   ├── types.ts                # Core type definitions
+│   │   ├── domain/                 # Domain models
+│   │   ├── services/               # Business services
+│   │   ├── policies/               # Authorization policies
+│   │   └── package.json            # Package configuration
+│   ├── trpc-contracts/             # @edge/trpc-contracts - API contracts
+│   │   ├── router.ts               # tRPC router definition
+│   │   └── package.json            # Package configuration
+│   └── adapters/                   # @edge/adapters - Runtime adapters
+│       ├── base.ts                 # Base adapter interface
+│       ├── cloudflare.ts           # Cloudflare adapter
+│       ├── deno.ts                 # Deno adapter
+│       ├── node.ts                 # Node.js adapter
+│       ├── vercel-edge.ts          # Vercel Edge adapter
+│       └── package.json            # Package configuration
 ├── server/                         # 🔧 Development server (Node.js)
 │   ├── index.ts                    # Dev server with Vite
 │   ├── db.ts                       # SQLite database setup
 │   └── migrations/                 # Database migrations
-├── shared/                         # 🔗 Shared code
+├── shared/                         # 🔗 Shared code (legacy)
 │   ├── routes.ts                   # API route contracts (Zod)
 │   ├── schema.ts                   # Database schema (Drizzle)
 │   └── types.ts                    # Shared TypeScript types
@@ -91,12 +110,17 @@ edge-starter-kit/
 │   ├── coding-standards.md         # Code style and conventions
 │   ├── workflows.md                # Step-by-step guides
 │   ├── deployment.md               # Runtime adapters and deployment
-│   └── checklist.md                # Pre-commit quality checks
+│   ├── checklist.md                # Pre-commit quality checks
+│   ├── package-exports.md          # Monorepo package system guide
+│   ├── deno-deploy.md              # Deno Deploy deployment guide
+│   └── deno-deploy-checklist.md    # Deno Deploy checklist
 ├── .kiro/steering/                 # 🤖 AI steering configuration
 │   ├── edge-compatibility.yaml     # Edge compatibility rules
 │   ├── workflows.yaml              # Development workflows
 │   ├── communication.yaml          # AI communication style
 │   └── README.md                   # Kiro-specific documentation
+├── test-packages.ts                # 🧪 Package import verification
+├── deno.json                       # Deno configuration
 ├── AI_ASSISTANT_SETUP.md           # 🤖 Complete AI assistant guide
 ├── AI_CONFIGURATION_COMPLETE.md    # 📋 Configuration summary
 ├── VERIFICATION.md                 # ✅ Verification checklist
@@ -111,7 +135,7 @@ edge-starter-kit/
 ├── LICENSE                         # MIT License
 ├── Dockerfile                      # Docker configuration
 ├── .env.example                    # Environment variables template
-└── package.json                    # Dependencies and scripts
+└── package.json                    # Dependencies and scripts (workspace root)
 ```
 
 ### Key Directories Explained
@@ -120,9 +144,51 @@ edge-starter-kit/
 |-----------|---------|------------------|
 | `apps/api/src/` | Platform-agnostic business logic | ✅ YES (Web Standards only) |
 | `apps/api/deploy/` | Platform-specific adapters | ⚠️ Platform-specific |
+| `packages/core/` | Core business logic (domain, services, policies) | ✅ YES (platform-agnostic) |
+| `packages/adapters/` | Runtime adapters (Cloudflare, Deno, Node, Vercel) | ✅ YES (edge-compatible) |
+| `packages/trpc-contracts/` | tRPC API contracts | ✅ YES (type-safe contracts) |
 | `server/` | Development server | ❌ NO (Node.js only) |
-| `shared/` | Type contracts and schemas | ✅ YES (platform-agnostic) |
+| `shared/` | Type contracts and schemas (legacy) | ✅ YES (platform-agnostic) |
 | `apps/client/` | React frontend | ✅ YES (browser APIs) |
+
+---
+
+## 📦 Monorepo Package System
+
+This project uses **npm workspaces** to organize code into importable packages under the `@edge/*` namespace:
+
+### Available Packages
+
+| Package | Description | Import Example |
+|---------|-------------|----------------|
+| `@edge/core` | Core business logic, domain models, services | `import { UserService } from '@edge/core/services/user-service'` |
+| `@edge/trpc-contracts` | tRPC API contracts and router | `import { appRouter } from '@edge/trpc-contracts'` |
+| `@edge/adapters` | Runtime adapters for all platforms | `import { DenoAdapter } from '@edge/adapters'` |
+| `@edge/api` | Main Hono application | `import { app } from '@edge/api'` |
+
+### Package Benefits
+
+- ✅ **Type-safe imports** - All packages are TypeScript-first
+- ✅ **Automatic linking** - npm workspace handles symlinks
+- ✅ **Clear boundaries** - Enforced separation of concerns
+- ✅ **Reusable code** - Share logic across apps
+- ✅ **Edge-compatible** - All packages use Web Standards
+
+### Quick Package Usage
+
+```typescript
+// Import from workspace packages
+import { UserService } from '@edge/core/services/user-service';
+import { appRouter } from '@edge/trpc-contracts';
+import { CloudflareAdapter } from '@edge/adapters';
+import { app } from '@edge/api';
+
+// Use in your code
+const userService = new UserService(db);
+const user = await userService.findById('123');
+```
+
+**📚 Full Guide**: See [`.edge-stack/package-exports.md`](./.edge-stack/package-exports.md) for complete documentation.
 
 ---
 
@@ -205,6 +271,12 @@ npm run check:client     # Type check client only
 npm test                 # Run all tests
 npm run test:api         # Run API tests
 npm run test:client      # Run client tests
+npx tsx test-packages.ts # Verify package imports work
+
+# Deno-specific (requires Deno installed)
+deno task dev            # Start Deno dev server (http://localhost:8000)
+deno task check          # Type check with Deno
+deno task test           # Run Deno tests
 
 # Building
 npm run build            # Build for production

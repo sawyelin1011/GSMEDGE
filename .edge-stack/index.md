@@ -25,6 +25,7 @@ These files ensure AI assistants understand the edge-first architecture and foll
 - **[Deployment](./deployment.md)**: Guide to adapters (Cloudflare, Vercel, Node.js) and switching runtimes.
 - **[Requirements](./requirements.md)**: Core technical requirements and constraints.
 - **[Checklist](./checklist.md)**: Pre-commit and pre-deployment checklists.
+- **[Package Exports](./package-exports.md)**: Monorepo package system and import guide.
 
 ### Performance & Optimization
 - **[Cloudflare Performance Guide](./cloudflare-performance.md)**: Comprehensive performance optimization guide

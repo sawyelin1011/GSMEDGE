@@ -1,0 +1,29 @@
+{
+  "name": "@edge/adapters",
+  "version": "1.0.0",
+  "description": "Runtime adapters for Edge Starter Kit",
+  "type": "module",
+  "main": "./base/index.ts",
+  "types": "./base/index.ts",
+  "exports": {
+    ".": "./base/index.ts",
+    "./base": "./base/index.ts",
+    "./base/*": "./base/*.ts"
+  },
+  "files": [
+    "base"
+  ],
+  "keywords": [
+    "edge",
+    "adapters",
+    "runtime",
+    "cloudflare",
+    "vercel",
+    "deno"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "@edge/core": "*",
+    "typescript": "^5.0.0"
+  }
+}

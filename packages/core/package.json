@@ -1,0 +1,30 @@
+{
+  "name": "@edge/core",
+  "version": "1.0.0",
+  "description": "Core types and utilities for Edge Starter Kit",
+  "type": "module",
+  "main": "./types.ts",
+  "types": "./types.ts",
+  "exports": {
+    ".": "./types.ts",
+    "./types": "./types.ts",
+    "./domain/*": "./domain/*.ts",
+    "./services/*": "./services/*.ts",
+    "./policies/*": "./policies/*.ts"
+  },
+  "files": [
+    "types.ts",
+    "domain",
+    "services",
+    "policies"
+  ],
+  "keywords": [
+    "edge",
+    "types",
+    "runtime-agnostic"
+  ],
+  "license": "MIT",
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

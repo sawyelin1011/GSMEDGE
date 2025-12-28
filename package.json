@@ -16,6 +16,8 @@
     "check": "tsc",
     "test": "vitest run",
     "test:watch": "vitest",
+    "test:packages": "tsx test-packages.ts",
+    "verify:packages": "tsx scripts/verify-packages.ts",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
     "db:push": "drizzle-kit push",
