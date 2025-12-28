@@ -1,0 +1,25 @@
+# .edge-stack Documentation
+
+This directory contains the rules, requirements, and guidelines for the Edge-Ready Monorepo.
+
+## 📚 Documentation Index
+
+- **[Architecture](./architecture.md)**: System design, project structure, and patterns.
+- **[Tech Stack](./tech-stack.md)**: Libraries, tools, and dependencies.
+- **[Coding Standards](./coding-standards.md)**: Style guides, conventions, and best practices.
+- **[Workflows](./workflows.md)**: Development processes, migration guides, and troubleshooting.
+- **[Deployment](./deployment.md)**: Guide to adapters (Cloudflare, Vercel, Node.js) and switching runtimes.
+- **[Requirements](./requirements.md)**: Core technical requirements and constraints.
+- **[Checklist](./checklist.md)**: Pre-commit and pre-deployment checklists.
+
+## 🚀 Quick Start
+
+1.  **Read [Requirements](./requirements.md)** to understand the constraints.
+2.  **Check [Coding Standards](./coding-standards.md)** for rules on what is allowed/forbidden.
+3.  **Use [Workflows](./workflows.md)** to find the right template for your task.
+4.  **Verify with [Checklist](./checklist.md)** before committing code.
+
+## 🤖 AI Assistant Instructions
+
+When working with this codebase, please load the relevant files from `.edge-stack/` to understand the context.
+Always prioritize **Web Standard APIs** and avoid Node.js-specific modules in the `/src/` directory.
