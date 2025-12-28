@@ -1,8 +1,8 @@
-# Edge Starter Kit 🚀
+# YLSTACK 🚀
 
-> **A production-ready, multi-runtime full-stack template that runs everywhere**
+> **Your Layer Stack - A production-ready, multi-runtime full-stack framework that runs everywhere**
 
-Build once, deploy anywhere. This starter kit provides a complete TypeScript full-stack application that runs seamlessly on Cloudflare Workers, Vercel Edge Functions, Deno Deploy, and Node.js - without changing a single line of business logic.
+Build once, deploy anywhere. YLSTACK provides a complete TypeScript full-stack framework with unified database management that runs seamlessly on Cloudflare Workers, Vercel Edge Functions, Deno Deploy, and Node.js - without changing a single line of business logic.
 
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.3-blue.svg)](https://www.typescriptlang.org/)
 [![Hono](https://img.shields.io/badge/Hono-4.0-orange.svg)](https://hono.dev/)
@@ -16,9 +16,10 @@ Build once, deploy anywhere. This starter kit provides a complete TypeScript ful
 - ⚡ **Multi-Runtime Support** - Deploy to Cloudflare Workers, Vercel Edge, Deno Deploy, or Node.js
 - 🔒 **Edge-Compatible** - All business logic uses Web Standard APIs only
 - 🎯 **Type-Safe** - End-to-end TypeScript with Zod validation
-- 🗄️ **Database Agnostic** - SQLite (dev), D1/Turso/Neon (production)
+- 🗄️ **Unified Database Management** - SQLite, Turso, D1, PostgreSQL with single CLI
+- 🛠️ **Powerful CLI** - `ylstack` CLI for database operations, migrations, and deployment
 - 🔄 **Hot Module Replacement** - Fast development with Vite
-- 📦 **Monorepo Structure** - Clear separation of concerns
+- 📦 **Monorepo Structure** - Clear separation of concerns with workspace packages
 - 🎨 **Modern Frontend** - React 18 with React Router
 - 🛡️ **Input Validation** - Zod schemas for all API inputs
 - 🚀 **Production Ready** - Docker support, health checks, migrations
@@ -28,10 +29,28 @@ Build once, deploy anywhere. This starter kit provides a complete TypeScript ful
 
 ## 🚦 Quick Start
 
+### Create a New Project
+
+```bash
+# Using npx (recommended)
+npx @ylstack/cli create my-app
+
+# Or install globally
+npm install -g @ylstack/cli
+ylstack create my-app
+
+# Follow the interactive prompts to choose:
+# - Template (fullstack, server-only, client-only, nextjs)
+# - Database (SQLite, Turso, D1, PostgreSQL)
+# - Runtime adapter (Cloudflare, Deno, Vercel, Node.js)
+```
+
+### Manual Setup
+
 ```bash
 # Clone the repository
 git clone <your-repo-url>
-cd edge-starter-kit
+cd ylstack
 
 # Install dependencies
 npm install
@@ -40,7 +59,7 @@ npm install
 cp .env.example .env
 
 # Initialize database
-npm run db:push
+ylstack db init
 
 # Start development server
 npm run dev
@@ -53,9 +72,37 @@ Visit `http://localhost:5173` to see your app running!
 ## 📁 Project Structure
 
 ```
-edge-starter-kit/
+ylstack/
+├── packages/                       # 📦 Workspace packages
+│   ├── cli/                        # 🛠️ @ylstack/cli
+│   │   ├── src/
+│   │   │   ├── commands/           # CLI commands
+│   │   │   │   ├── db/             # Database commands
+│   │   │   │   │   ├── generate.ts # Generate migrations
+│   │   │   │   │   ├── migrate.ts  # Run migrations
+│   │   │   │   │   ├── push.ts     # Push schema changes
+│   │   │   │   │   ├── seed.ts     # Seed database
+│   │   │   │   │   ├── studio.ts   # Launch Drizzle Studio
+│   │   │   │   │   ├── check.ts    # Check database config
+│   │   │   │   │   └── init.ts     # Initialize database
+│   │   │   │   ├── create.ts       # Create new project
+│   │   │   │   ├── dev.ts          # Development server
+│   │   │   │   ├── build.ts        # Build for production
+│   │   │   │   └── deploy.ts       # Deploy to platforms
+│   │   │   └── index.ts            # CLI entry point
+│   │   └── package.json
+│   ├── database/                   # 🗄️ @ylstack/database
+│   │   ├── src/
+│   │   │   ├── adapters/           # Database adapters
+│   │   │   │   └── index.ts        # Multi-runtime adapter factory
+│   │   │   └── migrations/         # Migration utilities
+│   │   │       └── runner.ts       # Migration runner
+│   │   └── package.json
+│   ├── core/                       # 🎯 @ylstack/core
+│   ├── adapters/                   # 🔌 @ylstack/adapters
+│   └── trpc-contracts/             # 📡 @ylstack/trpc-contracts
 ├── apps/
-│   ├── api/                        # 📦 @edge/api package
+│   ├── api/                        # 📦 API application
 │   │   ├── src/                    # 🌐 Platform-agnostic business logic
 │   │   │   ├── index.ts            # Main Hono app
 │   │   │   ├── types.ts            # AppEnv type definitions
@@ -78,23 +125,11 @@ edge-starter-kit/
 │           ├── components/         # Reusable components
 │           ├── App.tsx             # Root component
 │           └── main.tsx            # Entry point
-├── packages/                       # 📦 Internal packages
-│   ├── core/                       # @edge/core - Core business logic
-│   │   ├── types.ts                # Core type definitions
-│   │   ├── domain/                 # Domain models
-│   │   ├── services/               # Business services
-│   │   ├── policies/               # Authorization policies
-│   │   └── package.json            # Package configuration
-│   ├── trpc-contracts/             # @edge/trpc-contracts - API contracts
-│   │   ├── router.ts               # tRPC router definition
-│   │   └── package.json            # Package configuration
-│   └── adapters/                   # @edge/adapters - Runtime adapters
-│       ├── base.ts                 # Base adapter interface
-│       ├── cloudflare.ts           # Cloudflare adapter
-│       ├── deno.ts                 # Deno adapter
-│       ├── node.ts                 # Node.js adapter
-│       ├── vercel-edge.ts          # Vercel Edge adapter
-│       └── package.json            # Package configuration
+├── starters/                       # 🎯 Starter templates
+│   ├── fullstack/                  # Full-stack template
+│   ├── server-only/                # API-only template
+│   ├── client-only/                # Client-only template
+│   └── nextjs/                     # Next.js template
 ├── server/                         # 🔧 Development server (Node.js)
 │   ├── index.ts                    # Dev server with Vite
 │   ├── db.ts                       # SQLite database setup
@@ -153,18 +188,89 @@ edge-starter-kit/
 
 ---
 
+## 🛠️ YLSTACK CLI
+
+YLSTACK includes a powerful CLI for managing your project, database, and deployments.
+
+### Installation
+
+```bash
+# Install globally
+npm install -g @ylstack/cli
+
+# Or use via npx
+npx @ylstack/cli <command>
+```
+
+### Database Commands
+
+```bash
+# Initialize database with schema
+ylstack db init
+
+# Generate migrations from schema changes
+ylstack db generate
+
+# Run pending migrations
+ylstack db migrate
+
+# Push schema changes directly (dev only)
+ylstack db push
+
+# Seed database with initial data
+ylstack db seed
+
+# Open Drizzle Studio for database management
+ylstack db studio
+
+# Check database connection and configuration
+ylstack db check
+```
+
+### Project Commands
+
+```bash
+# Create a new project
+ylstack create my-app
+
+# Start development server
+ylstack dev
+
+# Build for production
+ylstack build [adapter]
+
+# Deploy to platform
+ylstack deploy [adapter]
+
+# Display project information
+ylstack info
+
+# Setup project environment
+ylstack setup
+```
+
+### Supported Databases
+
+- **SQLite** - Local development (file or in-memory)
+- **Turso** - Edge-compatible libSQL (production)
+- **Cloudflare D1** - Cloudflare's edge SQL database
+- **PostgreSQL** - Via Neon HTTP (edge-compatible)
+
+---
+
 ## 📦 Monorepo Package System
 
-This project uses **npm workspaces** to organize code into importable packages under the `@edge/*` namespace:
+This project uses **npm workspaces** to organize code into importable packages under the `@ylstack/*` namespace:
 
 ### Available Packages
 
 | Package | Description | Import Example |
 |---------|-------------|----------------|
-| `@edge/core` | Core business logic, domain models, services | `import { UserService } from '@edge/core/services/user-service'` |
-| `@edge/trpc-contracts` | tRPC API contracts and router | `import { appRouter } from '@edge/trpc-contracts'` |
-| `@edge/adapters` | Runtime adapters for all platforms | `import { DenoAdapter } from '@edge/adapters'` |
-| `@edge/api` | Main Hono application | `import { app } from '@edge/api'` |
+| `@ylstack/cli` | CLI tool for database and project management | `npx @ylstack/cli db init` |
+| `@ylstack/database` | Multi-runtime database adapters | `import { createDatabaseAdapter } from '@ylstack/database'` |
+| `@ylstack/core` | Core business logic, domain models, services | `import { UserService } from '@ylstack/core/services/user-service'` |
+| `@ylstack/trpc-contracts` | tRPC API contracts and router | `import { appRouter } from '@ylstack/trpc-contracts'` |
+| `@ylstack/adapters` | Runtime adapters for all platforms | `import { DenoAdapter } from '@ylstack/adapters'` |
 
 ### Package Benefits
 
@@ -173,15 +279,16 @@ This project uses **npm workspaces** to organize code into importable packages u
 - ✅ **Clear boundaries** - Enforced separation of concerns
 - ✅ **Reusable code** - Share logic across apps
 - ✅ **Edge-compatible** - All packages use Web Standards
+- ✅ **Unified CLI** - Single tool for all operations
 
 ### Quick Package Usage
 
 ```typescript
 // Import from workspace packages
-import { UserService } from '@edge/core/services/user-service';
-import { appRouter } from '@edge/trpc-contracts';
-import { CloudflareAdapter } from '@edge/adapters';
-import { app } from '@edge/api';
+import { createDatabaseAdapter } from '@ylstack/database';
+import { UserService } from '@ylstack/core/services/user-service';
+import { appRouter } from '@ylstack/trpc-contracts';
+import { CloudflareAdapter } from '@ylstack/adapters';
 
 // Use in your code
 const userService = new UserService(db);

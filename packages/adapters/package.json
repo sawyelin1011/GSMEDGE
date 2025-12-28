@@ -1,7 +1,7 @@
 {
-  "name": "@edge/adapters",
+  "name": "@ylstack/adapters",
   "version": "1.0.0",
-  "description": "Runtime adapters for Edge Starter Kit",
+  "description": "Runtime adapters for YLSTACK",
   "type": "module",
   "main": "./base/index.ts",
   "types": "./base/index.ts",
@@ -23,7 +23,7 @@
   ],
   "license": "MIT",
   "peerDependencies": {
-    "@edge/core": "*",
+    "@ylstack/core": "*",
     "typescript": "^5.0.0"
   }
 }

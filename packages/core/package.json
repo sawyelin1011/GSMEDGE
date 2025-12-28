@@ -1,7 +1,7 @@
 {
-  "name": "@edge/core",
+  "name": "@ylstack/core",
   "version": "1.0.0",
-  "description": "Core types and utilities for Edge Starter Kit",
+  "description": "Core types and utilities for YLSTACK",
   "type": "module",
   "main": "./types.ts",
   "types": "./types.ts",

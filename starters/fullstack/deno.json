@@ -1,0 +1,16 @@
+{
+  "tasks": {
+    "dev": "deno run --allow-net --allow-read --allow-env --watch src/adapters/deno/mod.ts",
+    "start": "deno run --allow-net --allow-read --allow-env src/adapters/deno/mod.ts"
+  },
+  "imports": {
+    "hono": "https://deno.land/x/hono@v4.0.0/mod.ts",
+    "hono/": "https://deno.land/x/hono@v4.0.0/"
+  },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react",
+    "lib": ["deno.window", "dom", "dom.iterable"],
+    "strict": true
+  }
+}

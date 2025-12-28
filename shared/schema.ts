@@ -7,8 +7,8 @@ import { z } from "zod";
 
 // Helper for UUIDs in SQLite
 const uuid = (name: string) => text(name).$defaultFn(() => crypto.randomUUID());
-// Helper for Timestamps in SQLite
-const timestamp = (name: string) => text(name).default(new Date().toISOString());
+// Helper for Timestamps in SQLite  
+const timestamp = (name: string) => text(name).$defaultFn(() => new Date().toISOString());
 
 // Tenants (Multi-tenancy root)
 export const tenants = sqliteTable("tenants", {

@@ -1,0 +1,46 @@
+{
+  "name": "@ylstack/database",
+  "version": "1.0.0",
+  "description": "Multi-runtime database adapters for YLSTACK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./adapters": {
+      "types": "./dist/adapters/index.d.ts",
+      "import": "./dist/adapters/index.js"
+    },
+    "./migrations": {
+      "types": "./dist/migrations/runner.d.ts",
+      "import": "./dist/migrations/runner.js"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts src/adapters/index.ts src/migrations/runner.ts --format esm --dts",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "drizzle-orm": "^0.38.3",
+    "@libsql/client": "^0.14.0",
+    "postgres": "^3.4.5"
+  },
+  "peerDependencies": {
+    "better-sqlite3": ">=11"
+  },
+  "peerDependenciesMeta": {
+    "better-sqlite3": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20250110.0",
+    "@types/better-sqlite3": "^7.6.12",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3"
+  }
+}

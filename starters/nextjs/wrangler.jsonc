@@ -1,0 +1,99 @@
+{
+  "name": "nextjs-edge-starter",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2025-01-10",
+  "compatibility_flags": ["nodejs_compat"],
+  
+  // Account and workers configuration
+  "account_id": "", // Add your Cloudflare account ID
+  "workers_dev": true,
+  
+  // Routes (configure for production)
+  "routes": [
+    {
+      "pattern": "example.com/*",
+      "zone_name": "example.com"
+    }
+  ],
+  
+  // KV Namespaces for caching
+  "kv_namespaces": [
+    {
+      "binding": "NEXT_CACHE",
+      "id": "", // Add your KV namespace ID for incremental cache
+      "preview_id": "" // Add preview namespace ID
+    },
+    {
+      "binding": "NEXT_TAG_CACHE",
+      "id": "", // Add your KV namespace ID for tag cache
+      "preview_id": "" // Add preview namespace ID
+    }
+  ],
+  
+  // R2 Bucket for large cache items
+  "r2_buckets": [
+    {
+      "binding": "NEXT_CACHE_BUCKET",
+      "bucket_name": "next-cache-bucket",
+      "preview_bucket_name": "next-cache-bucket-preview"
+    }
+  ],
+  
+  // D1 Database for revalidation queue
+  "d1_databases": [
+    {
+      "binding": "NEXT_REVALIDATION_DB",
+      "database_name": "next-revalidation",
+      "database_id": "", // Add your D1 database ID
+      "preview_database_id": "" // Add preview database ID
+    }
+  ],
+  
+  // Durable Objects for skew protection
+  "durable_objects": {
+    "bindings": [
+      {
+        "name": "NEXT_SKEW_PROTECTION",
+        "class_name": "SkewProtection",
+        "script_name": "nextjs-edge-starter"
+      }
+    ]
+  },
+  
+  // Environment variables
+  "vars": {
+    "NODE_ENV": "production",
+    "NEXT_PUBLIC_API_URL": "https://api.example.com"
+  },
+  
+  // Build configuration
+  "build": {
+    "command": "npm run build:cloudflare",
+    "cwd": ".",
+    "watch_paths": ["app/**/*", "public/**/*"]
+  },
+  
+  // Limits
+  "limits": {
+    "cpu_ms": 50
+  },
+  
+  // Observability
+  "observability": {
+    "enabled": true,
+    "head_sampling_rate": 1
+  },
+  
+  // Tail consumers for logging
+  "tail_consumers": [
+    {
+      "service": "log-consumer"
+    }
+  ],
+  
+  // Assets configuration (for static files)
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  }
+}
