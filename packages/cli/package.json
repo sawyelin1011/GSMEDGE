@@ -1,0 +1,53 @@
+{
+  "name": "@ylstack/cli",
+  "version": "1.0.0",
+  "description": "YLSTACK CLI - Multi-runtime edge-first development toolkit with database management",
+  "type": "module",
+  "bin": {
+    "ylstack": "./dist/index.js",
+    "yl": "./dist/index.js"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format esm --dts --clean --out-dir dist",
+    "dev": "tsup src/index.ts --format esm --watch",
+    "test": "vitest",
+    "type-check": "tsc --noEmit"
+  },
+  "keywords": [
+    "ylstack",
+    "edge",
+    "cli",
+    "cloudflare",
+    "deno",
+    "vercel",
+    "hono",
+    "drizzle",
+    "multi-runtime",
+    "database"
+  ],
+  "dependencies": {
+    "@ylstack/core": "*",
+    "@ylstack/adapters": "*",
+    "@ylstack/database": "*",
+    "commander": "^11.1.0",
+    "prompts": "^2.4.2",
+    "chalk": "^5.3.0",
+    "ora": "^8.0.1",
+    "execa": "^8.0.1",
+    "fs-extra": "^11.2.0",
+    "degit": "^2.8.4",
+    "dotenv": "^16.4.5",
+    "drizzle-kit": "^0.28.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.5",
+    "@types/prompts": "^2.4.9",
+    "@types/fs-extra": "^11.0.4",
+    "tsup": "^8.3.5",
+    "typescript": "^5.7.3",
+    "vitest": "^2.1.8"
+  }
+}

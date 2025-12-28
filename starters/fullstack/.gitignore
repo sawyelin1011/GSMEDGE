@@ -1,0 +1,48 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+.wrangler/
+.vercel/
+.output/
+
+# Development
+.vite/
+.cache/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.*.local
+
+# Editor directories
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Database
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# TypeScript
+*.tsbuildinfo
+
+# Testing
+coverage/
+.nyc_output/

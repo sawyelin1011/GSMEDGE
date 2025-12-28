@@ -1,0 +1,55 @@
+name = "fullstack-edge-starter"
+main = "src/adapters/cloudflare/worker.ts"
+compatibility_date = "2024-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Account ID (replace with your own)
+# account_id = "your-account-id"
+
+# Workers configuration
+workers_dev = true
+route = ""
+zone_id = ""
+
+# Build configuration
+[build]
+command = "npm run build"
+
+# Environment variables
+[vars]
+ENVIRONMENT = "production"
+
+# KV Namespaces (optional)
+# [[kv_namespaces]]
+# binding = "KV"
+# id = "your-kv-namespace-id"
+
+# D1 Databases (optional)
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "your-database-name"
+# database_id = "your-database-id"
+
+# R2 Buckets (optional)
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "your-bucket-name"
+
+# Durable Objects (optional)
+# [[durable_objects.bindings]]
+# name = "COUNTER"
+# class_name = "Counter"
+# script_name = "your-script-name"
+
+# Service bindings (optional)
+# [[services]]
+# binding = "SERVICE"
+# service = "your-service-name"
+
+# Analytics Engine (optional)
+# [analytics_engine_datasets]
+# binding = "ANALYTICS"
+
+# Limits
+[limits]
+cpu_ms = 50

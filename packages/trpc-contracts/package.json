@@ -1,7 +1,7 @@
 {
-  "name": "@edge/trpc-contracts",
+  "name": "@ylstack/trpc-contracts",
   "version": "1.0.0",
-  "description": "tRPC contract types for Edge Starter Kit",
+  "description": "tRPC contract types for YLSTACK",
   "type": "module",
   "main": "./index.ts",
   "types": "./index.ts",

@@ -1,12 +1,13 @@
 {
-  "name": "edge-starter",
+  "name": "ylstack",
   "version": "1.0.0",
-  "description": "Multi-runtime edge-ready starter kit (Hono, Drizzle, Zod)",
+  "description": "YLSTACK - Multi-runtime edge-first development toolkit (Hono, Drizzle, Zod)",
   "type": "module",
   "license": "MIT",
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "starters/*"
   ],
   "scripts": {
     "dev": "cross-env NODE_ENV=development tsx server/index.ts",
@@ -18,24 +19,17 @@
     "test:watch": "vitest",
     "test:packages": "tsx test-packages.ts",
     "verify:packages": "tsx scripts/verify-packages.ts",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
-    "deploy:cloudflare": "wrangler deploy",
-    "deploy:cloudflare:dev": "wrangler deploy --env development",
-    "deploy:cloudflare:staging": "wrangler deploy --env staging",
-    "deploy:cloudflare:prod": "wrangler deploy --env production",
-    "cf:dev": "wrangler dev",
-    "cf:tail": "wrangler tail",
-    "cf:d1:create": "wrangler d1 create edge-starter-kit-db",
-    "cf:d1:list": "wrangler d1 list",
-    "cf:kv:create": "wrangler kv:namespace create CACHE",
-    "cf:login": "wrangler login",
-    "deno:dev": "deno task dev",
-    "deno:start": "deno task start",
-    "deno:check": "deno task check",
-    "deno:deploy": "deno task deploy"
+    "db:generate": "ylstack db generate",
+    "db:migrate": "ylstack db migrate",
+    "db:push": "ylstack db push",
+    "db:studio": "ylstack db studio",
+    "db:check": "ylstack db check",
+    "db:seed": "ylstack db seed",
+    "deploy": "ylstack deploy",
+    "deploy:cloudflare": "ylstack deploy --runtime cloudflare",
+    "deploy:vercel": "ylstack deploy --runtime vercel",
+    "deploy:deno": "ylstack deploy --runtime deno",
+    "info": "ylstack info"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.7",

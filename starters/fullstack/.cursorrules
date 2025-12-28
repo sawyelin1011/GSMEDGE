@@ -1,0 +1,286 @@
+# Edge Fullstack Starter - AI Coding Rules
+
+## 🎯 Project Overview
+
+This is an **edge-first fullstack template** that runs on multiple runtimes:
+- Cloudflare Workers
+- Vercel Edge Functions
+- Deno Deploy
+- Node.js
+
+**Core Philosophy**: Write once, deploy anywhere using Web Standards.
+
+---
+
+## 🚫 Critical Constraints
+
+### Edge Compatibility Rules
+
+#### ❌ FORBIDDEN in `src/server/`:
+```typescript
+// Node.js built-ins
+import fs from 'fs';
+import path from 'path';
+import crypto from 'crypto';
+import { Buffer } from 'buffer';
+
+// Native modules
+import bcrypt from 'bcrypt';
+import sqlite3 from 'better-sqlite3';
+
+// Node.js APIs
+process.env.NODE_ENV;
+__dirname;
+__filename;
+```
+
+#### ✅ ALLOWED in `src/server/`:
+```typescript
+// Web Standard APIs
+crypto.randomUUID();
+crypto.subtle.digest();
+fetch('https://api.example.com');
+new Request();
+new Response();
+new URL();
+new Headers();
+
+// Platform-agnostic libraries
+import { Hono } from 'hono';
+import { z } from 'zod';
+import { drizzle } from 'drizzle-orm';
+
+// Environment via Hono context
+c.env.DATABASE_URL;
+```
+
+---
+
+## 📁 Project Structure
+
+```
+src/
+├── server/          # Backend API (EDGE-COMPATIBLE ONLY)
+│   ├── index.ts     # Hono app entry point
+│   └── routes/      # API route handlers
+├── client/          # React frontend (browser APIs only)
+│   ├── pages/       # Page components
+│   ├── main.tsx     # React entry point
+│   └── index.css    # Global styles
+├── adapters/        # Runtime-specific entry points
+│   ├── cloudflare/  # Cloudflare Workers adapter
+│   ├── vercel/      # Vercel Edge adapter
+│   ├── deno/        # Deno Deploy adapter
+│   └── node/        # Node.js adapter (can use Node APIs)
+└── shared/          # Type contracts (platform-agnostic)
+```
+
+**Rule**: If it's in `src/server/`, it MUST work in Cloudflare Workers.
+
+---
+
+## ✅ Standard Workflows
+
+### Adding a New API Route
+
+**Step 1**: Create route handler in `src/server/routes/`
+
+```typescript
+// src/server/routes/items.ts
+import { Hono } from 'hono';
+import { z } from 'zod';
+
+const items = new Hono();
+
+// Define Zod schema
+const itemSchema = z.object({
+  id: z.string().uuid(),
+  name: z.string().min(1),
+  createdAt: z.string().datetime(),
+});
+
+// GET /api/items
+items.get('/', async (c) => {
+  // Get database from context (injected by middleware)
+  const db = c.get('db');
+  const results = await db.select().from(itemsTable).all();
+  return c.json(results);
+});
+
+// POST /api/items
+items.post('/', async (c) => {
+  try {
+    const body = await c.req.json();
+    const validated = itemSchema.omit({ id: true, createdAt: true }).parse(body);
+    
+    const newItem = {
+      id: crypto.randomUUID(),
+      ...validated,
+      createdAt: new Date().toISOString(),
+    };
+    
+    const db = c.get('db');
+    await db.insert(itemsTable).values(newItem);
+    
+    return c.json(newItem, 201);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return c.json({ error: 'Validation failed', details: error.errors }, 400);
+    }
+    return c.json({ error: 'Internal server error' }, 500);
+  }
+});
+
+export default items;
+```
+
+**Step 2**: Register route in `src/server/index.ts`
+
+```typescript
+import items from './routes/items';
+
+app.route('/api/items', items);
+```
+
+**Step 3**: Create React page in `src/client/pages/`
+
+```typescript
+// src/client/pages/ItemsPage.tsx
+import { useState, useEffect } from 'react';
+
+interface Item {
+  id: string;
+  name: string;
+  createdAt: string;
+}
+
+export default function ItemsPage() {
+  const [items, setItems] = useState<Item[]>([]);
+  
+  useEffect(() => {
+    fetch('/api/items')
+      .then(res => res.json())
+      .then(data => setItems(data));
+  }, []);
+  
+  return (
+    <div>
+      <h1>Items</h1>
+      {items.map(item => (
+        <div key={item.id}>{item.name}</div>
+      ))}
+    </div>
+  );
+}
+```
+
+**Step 4**: Add route to `src/client/App.tsx`
+
+```typescript
+import ItemsPage from './pages/ItemsPage';
+
+<Route path="/items" element={<ItemsPage />} />
+```
+
+---
+
+## 🎨 Code Style
+
+### TypeScript
+- **Strict mode** - No `any` types
+- **Zod validation** - Validate all API inputs
+- **Type inference** - Use `z.infer<typeof schema>`
+
+### File Naming
+- **Components**: PascalCase (`ItemsPage.tsx`)
+- **Routes**: kebab-case (`user-profile.ts`)
+- **Utilities**: camelCase (`formatDate.ts`)
+
+### Error Handling
+```typescript
+// ✅ Always use try-catch with proper status codes
+try {
+  const validated = schema.parse(data);
+  // ... business logic
+  return c.json(result, 201);
+} catch (error) {
+  if (error instanceof z.ZodError) {
+    return c.json({ error: 'Validation failed', details: error.errors }, 400);
+  }
+  console.error('Unexpected error:', error);
+  return c.json({ error: 'Internal server error' }, 500);
+}
+```
+
+---
+
+## 🚨 Red Flags
+
+Stop and review if you see:
+
+🚩 Importing Node.js built-ins in `src/server/`
+🚩 Using `process.env` in `src/server/` (use `c.env` instead)
+🚩 Using `__dirname` or `__filename` in `src/server/`
+🚩 Missing Zod validation on API inputs
+🚩 Hardcoded environment values
+🚩 Direct database imports (should use context injection)
+
+---
+
+## 🧪 Testing Checklist
+
+Before committing:
+- [ ] TypeScript check passes (`npm run type-check`)
+- [ ] Linting passes (`npm run lint`)
+- [ ] Dev server runs (`npm run dev`)
+- [ ] All API routes return proper status codes
+- [ ] All inputs validated with Zod
+- [ ] No Node.js APIs in `src/server/`
+- [ ] Environment variables accessed via `c.env`
+
+---
+
+## 📚 Tech Stack Reference
+
+### Backend
+- **Hono** - Web framework (edge-compatible)
+- **Drizzle ORM** - Type-safe database queries
+- **Zod** - Runtime validation
+- **SQLite** - Dev database (via better-sqlite3 in dev server only)
+
+### Frontend
+- **React 18** - UI library
+- **React Router** - Client-side routing
+- **Vite** - Build tool and dev server
+- **Tailwind CSS** - Utility-first styling
+
+### Deployment
+- **Cloudflare Workers** - Edge runtime
+- **Vercel Edge Functions** - Edge runtime
+- **Deno Deploy** - Edge runtime
+- **Node.js** - Traditional runtime
+
+---
+
+## 💡 Pro Tips
+
+1. **Start with types** - Define Zod schemas before writing handlers
+2. **Validate everything** - Use Zod on all API inputs
+3. **Think edge-first** - If it doesn't work in Workers, it's not edge-compatible
+4. **Inject dependencies** - Use Hono context for database, env vars, etc.
+5. **Use Web Standards** - Stick to APIs available in browsers
+
+---
+
+## 🔗 Quick Links
+
+- [Hono Documentation](https://hono.dev/)
+- [Drizzle ORM](https://orm.drizzle.team/)
+- [Zod Documentation](https://zod.dev/)
+- [React Documentation](https://react.dev/)
+- [Vite Documentation](https://vitejs.dev/)
+- [Tailwind CSS](https://tailwindcss.com/)
+
+---
+
+**Remember**: This template is designed to run anywhere. Keep it edge-compatible!

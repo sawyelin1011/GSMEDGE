@@ -1,0 +1,344 @@
+# Next.js Edge Starter - AI Coding Rules
+
+## Project Context
+This is a Next.js 16 starter with OpenNext for edge deployment (Cloudflare Workers, Vercel Edge, AWS Lambda).
+
+## Core Principles
+1. **Edge-First**: All code must be edge-compatible (no Node.js built-ins)
+2. **Server Components by Default**: Use 'use client' only when needed
+3. **Type Safety**: Strict TypeScript, no `any` types
+4. **Web Standards**: Use Web APIs (fetch, crypto, etc.)
+
+## Next.js App Router Rules
+
+### File Structure
+- `app/` - Pages and layouts (App Router)
+- `app/_components/` - Reusable components
+- `app/api/` - API routes
+- `lib/` - Utility functions
+- `public/` - Static assets
+
+### Server Components (Default)
+```tsx
+// ✅ Server Component (default)
+export default async function Page() {
+  const data = await fetchData(); // Runs on server
+  return <div>{data}</div>;
+}
+```
+
+### Client Components
+```tsx
+// ✅ Client Component (use 'use client')
+'use client';
+
+import { useState } from 'react';
+
+export function Counter() {
+  const [count, setCount] = useState(0);
+  return <button onClick={() => setCount(count + 1)}>{count}</button>;
+}
+```
+
+### API Routes
+```tsx
+// ✅ Edge runtime API route
+export const runtime = 'edge';
+
+export async function GET(request: NextRequest) {
+  return NextResponse.json({ message: 'Hello' });
+}
+```
+
+## Edge Compatibility
+
+### ❌ FORBIDDEN
+```tsx
+// Node.js built-ins
+import fs from 'fs';
+import path from 'path';
+import { Buffer } from 'buffer';
+
+// process.env in components
+const env = process.env.NODE_ENV;
+```
+
+### ✅ ALLOWED
+```tsx
+// Web APIs
+const uuid = crypto.randomUUID();
+const response = await fetch('https://api.example.com');
+
+// Environment variables (via next.config.ts or runtime)
+const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+```
+
+## Rendering Strategies
+
+### SSR (Server-Side Rendering)
+```tsx
+// Runs on every request
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+```
+
+### SSG (Static Site Generation)
+```tsx
+// Pre-rendered at build time
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+
+// Force static generation
+export const dynamic = 'force-static';
+```
+
+### ISR (Incremental Static Regeneration)
+```tsx
+// Static + background regeneration
+export default async function Page() {
+  const data = await fetchData();
+  return <div>{data}</div>;
+}
+
+// Revalidate every 60 seconds
+export const revalidate = 60;
+```
+
+## Data Fetching
+
+### In Server Components
+```tsx
+// ✅ Direct async/await
+export default async function Page() {
+  const data = await fetch('https://api.example.com/data');
+  const json = await data.json();
+  return <div>{json.message}</div>;
+}
+```
+
+### In Client Components
+```tsx
+// ✅ Use useEffect or React Query
+'use client';
+
+import { useEffect, useState } from 'react';
+
+export function DataComponent() {
+  const [data, setData] = useState(null);
+  
+  useEffect(() => {
+    fetch('/api/data')
+      .then(res => res.json())
+      .then(setData);
+  }, []);
+  
+  return <div>{data?.message}</div>;
+}
+```
+
+## Metadata
+
+### Static Metadata
+```tsx
+export const metadata: Metadata = {
+  title: 'Page Title',
+  description: 'Page description',
+};
+```
+
+### Dynamic Metadata
+```tsx
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const data = await fetchData(params.id);
+  return {
+    title: data.title,
+    description: data.description,
+  };
+}
+```
+
+## Styling
+
+### Tailwind CSS
+```tsx
+// ✅ Use Tailwind utility classes
+<div className="p-6 border rounded-lg hover:shadow-lg">
+  <h1 className="text-4xl font-bold mb-4">Title</h1>
+</div>
+```
+
+### CSS Modules
+```tsx
+// ✅ Import CSS modules
+import styles from './page.module.css';
+
+<div className={styles.container}>Content</div>
+```
+
+## Error Handling
+
+### Not Found
+```tsx
+import { notFound } from 'next/navigation';
+
+export default async function Page({ params }) {
+  const data = await fetchData(params.id);
+  
+  if (!data) {
+    notFound(); // Shows 404 page
+  }
+  
+  return <div>{data.title}</div>;
+}
+```
+
+### Error Boundaries
+```tsx
+// app/error.tsx
+'use client';
+
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error;
+  reset: () => void;
+}) {
+  return (
+    <div>
+      <h2>Something went wrong!</h2>
+      <button onClick={reset}>Try again</button>
+    </div>
+  );
+}
+```
+
+## OpenNext Configuration
+
+### Cloudflare Workers
+```typescript
+// open-next.config.ts
+const config: OpenNextConfig = {
+  default: {
+    override: {
+      wrapper: 'cloudflare-worker',
+      incrementalCache: 'cloudflare-kv',
+    },
+  },
+};
+```
+
+### Required Cloudflare Bindings
+- **KV**: NEXT_CACHE, NEXT_TAG_CACHE
+- **R2**: NEXT_CACHE_BUCKET
+- **D1**: NEXT_REVALIDATION_DB
+- **Durable Objects**: NEXT_SKEW_PROTECTION
+
+## Deployment
+
+### Cloudflare Workers
+```bash
+npm run build:cloudflare
+npm run deploy:cloudflare
+```
+
+### Vercel Edge
+```bash
+npm run deploy:vercel
+```
+
+### Node.js
+```bash
+npm run build:node
+npm run start:node
+```
+
+## Best Practices
+
+1. **Use Server Components by default** - Only use Client Components when you need interactivity
+2. **Minimize Client JavaScript** - Keep bundle sizes small
+3. **Leverage caching** - Use ISR for content that updates periodically
+4. **Optimize images** - Use Next.js Image component with proper loader
+5. **Type everything** - Use TypeScript for all components and functions
+6. **Test edge compatibility** - Ensure code works in Cloudflare Workers
+7. **Use Web Standards** - Prefer Web APIs over Node.js APIs
+
+## Common Patterns
+
+### Loading States
+```tsx
+import { Suspense } from 'react';
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <AsyncComponent />
+    </Suspense>
+  );
+}
+```
+
+### Dynamic Routes
+```tsx
+// app/blog/[slug]/page.tsx
+export async function generateStaticParams() {
+  const posts = await getPosts();
+  return posts.map(post => ({ slug: post.slug }));
+}
+
+export default async function Page({ params }) {
+  const post = await getPost(params.slug);
+  return <article>{post.content}</article>;
+}
+```
+
+### Parallel Routes
+```tsx
+// app/dashboard/@analytics/page.tsx
+export default function Analytics() {
+  return <div>Analytics</div>;
+}
+
+// app/dashboard/@team/page.tsx
+export default function Team() {
+  return <div>Team</div>;
+}
+
+// app/dashboard/layout.tsx
+export default function Layout({ analytics, team }) {
+  return (
+    <div>
+      {analytics}
+      {team}
+    </div>
+  );
+}
+```
+
+## Debugging
+
+### Development
+```bash
+npm run dev  # Start dev server with hot reload
+```
+
+### Type Checking
+```bash
+npm run type-check  # Check TypeScript types
+```
+
+### Linting
+```bash
+npm run lint  # Run ESLint
+```
+
+## Resources
+
+- [Next.js Docs](https://nextjs.org/docs)
+- [OpenNext Docs](https://opennext.js.org/)
+- [Cloudflare Workers](https://workers.cloudflare.com/)
+- [Edge Runtime](https://edge-runtime.vercel.app/)
